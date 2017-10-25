@@ -118,8 +118,28 @@
         instructions (eval tag)]
     (t/before? (:remind-date instructions) now)))
 
-(filter should-remind?  files-with-clj-tags) ; files which need to be reminded...remound?
+(defn insert-comment
+  [content]
+  (let [[fst scnd & rst] (s/split content #"\|\>\(")]
+    (str fst "|>(comment " scnd (s/join "|>(" rst))))
 
+(defn insert-comment-into-file
+  [file]
+  {
+   :file (:file file)
+   :contents (insert-comment (:contents file))})
+
+(defn write-file
+  [file])
+
+(let [file (insert-comment-into-file (first files-with-clj-tags))
+      writer (clojure.java.io/writer (.getCanonicalPath (:file file)))]
+  (.write writer (str (:contents file)))
+  (.close writer))
+
+(second (s/split (:contents (first files-with-clj-tags)) #"\|\>\("))
+
+(filter should-remind?  files-with-clj-tags) ; files which need to be reminded...remound?
 
 ; stuff for later
 ; recursion
