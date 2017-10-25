@@ -1,7 +1,10 @@
 (ns clojure-noob.core
   (:gen-class)
   (:require [me.raynes.fs :as fs]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [clj-time.core :as t]))
+
+(def now (t/now))
 
 ; so we're gonna need to check for the |> characters that start an expression first - only |>(...)
 ; but we'll want to narrow it down to just the |> so we can slurp the (...) part
@@ -92,23 +95,31 @@
 (defn remind
   "fill out defaults for any options that arent present, return instructions for execute-for-file to do"
   [opts]
-  (let [{:keys [month day]} opts]
-    { 
-     :month month
-     :day day }))
+  (let [{:keys [year month day]} opts
+        y (if (nil? year)
+            (t/year now)
+            year)
+        m (if (nil? month)
+            (t/month now)
+            month)
+        d (if (nil? day)
+            (t/day now)
+            day)]
+    ; construct a remind-date based on what we have from here. Time is assumed to be 00:01
+    {
+     :remind-date (t/date-time y m d 00 01)
+    }))
 
 ; could have the remind file come up with some instructions that could be used for later...
-(defn execute-for-file
+(defn should-remind?
   "take a file, grab the first form that can be executed inside it, and run it with the file in context"
   [file]
   (let [tag (read-tag file)
         instructions (eval tag)]
-    (println instructions)))
+    (t/before? (:remind-date instructions) now)))
 
-(execute-for-file (first files-with-clj-tags))
-; now we need to set up a symbol 'remind' which sends the file to the top after the date given passes...so it just needs touching...so we basically just need to remove the |>() part from the text and re-save the file for now
+(filter should-remind?  files-with-clj-tags) ; files which need to be reminded...remound?
 
-; remind will need access to our file map...
 
 ; stuff for later
 ; recursion
