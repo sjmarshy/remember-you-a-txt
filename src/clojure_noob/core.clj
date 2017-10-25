@@ -3,9 +3,6 @@
   (:require [me.raynes.fs :as fs]
             [clojure.string :as s]))
 
-; not sure I'll need this for much longer - the new plan is to use macros to define a mini-language for reminders...
-(def iso-8601-regex #"/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/")
-
 ; so we're gonna need to check for the |> characters that start an expression first - only |>(...)
 ; but we'll want to narrow it down to just the |> so we can slurp the (...) part
 ; - we can do that by skipping out on the first two characters of the string 
@@ -92,7 +89,23 @@
     (read-string
       (.substring contents (+ 2 origin)))))
 
-(read-tag (first files-with-clj-tags))
+(defn remind
+  "fill out defaults for any options that arent present, return instructions for execute-for-file to do"
+  [opts]
+  (let [{:keys [month day]} opts]
+    { 
+     :month month
+     :day day }))
+
+; could have the remind file come up with some instructions that could be used for later...
+(defn execute-for-file
+  "take a file, grab the first form that can be executed inside it, and run it with the file in context"
+  [file]
+  (let [tag (read-tag file)
+        instructions (eval tag)]
+    (println instructions)))
+
+(execute-for-file (first files-with-clj-tags))
 ; now we need to set up a symbol 'remind' which sends the file to the top after the date given passes...so it just needs touching...so we basically just need to remove the |>() part from the text and re-save the file for now
 
 ; remind will need access to our file map...
