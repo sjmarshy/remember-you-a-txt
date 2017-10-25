@@ -1,4 +1,4 @@
-(defproject clojure-noob "0.1.0-SNAPSHOT"
+(defproject remember-you-a-txt "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -7,6 +7,6 @@
                  [org.clojure/clojure "1.8.0"]
                  [me.raynes/fs "1.4.6"]
                  [clj-time "0.14.0"]]
-  :main ^:skip-aot clojure-noob.core
+  :main ^:skip-aot remember-you-a-txt.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

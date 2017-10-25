@@ -1,4 +1,4 @@
-(ns clojure-noob.core
+(ns remember-you-a-txt.core
   (:gen-class)
   (:require [me.raynes.fs :as fs]
             [clojure.string :as s]
